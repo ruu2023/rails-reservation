@@ -1,0 +1,24 @@
+<%= turbo_frame_tag "calendar_frame" do %>
+  <%= month_calendar(events: @events) do |date, events| %>
+    <div class="flex justify-between">
+      <span class="text-xs sm:text-sm"><%= date.day %></span>
+      <%= link_to "+", new_event_path(date: date), 
+          class: "text-md bg-blue-50 text-blue-600 px-2 py-0.5 rounded hover:bg-blue-100 transition",
+          data: { turbo_frame: "modal" } %>
+    </div>
+    <%# PCのみ表示（md:block）、スマホでは非表示（hidden） %>
+    <div class="hidden md:block mt-1">
+      <% events.slice(0, 2).each do |event| %>
+        <div class="truncate text-[10px] bg-blue-100 text-blue-800 p-0.5 mb-0.5 rounded">
+          <%= event.title %>
+        </div>
+      <% end %>
+    </div>
+    <%# スマホのみ：予定がある日に「ドット」だけ表示 %>
+    <% if events.any? %>
+      <div class="md:hidden flex justify-center mt-1">
+        <div class="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>

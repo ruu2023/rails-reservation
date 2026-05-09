@@ -1,4 +1,4 @@
-class SchedulesController < ApplicationController
+class EventsController < ApplicationController
   def new
     @event = Event.new
 
@@ -15,7 +15,7 @@ class SchedulesController < ApplicationController
   def create
     @event = Event.new(event_params)
     if @event.save
-      redirect_to schedules_path, notice: "予約を登録しました"
+      redirect_to events_path, notice: "予約を登録しました"
     else
       render :new, status: :unprocessable_entity
     end
