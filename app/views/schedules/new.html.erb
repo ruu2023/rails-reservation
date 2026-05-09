@@ -1,0 +1,45 @@
+<%= turbo_frame_tag "modal" do %>
+  <%# 1. 画面全体を覆う背景 (Overlay) %>
+  <div class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    
+    <%# 2. モーダル本体 (Dialog) %>
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all">
+      
+      <%# ヘッダー %>
+      <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+        <h2 class="text-xl font-bold text-gray-800">新規予約登録</h2>
+        <%# 右上の「×」ボタンもキャンセルと同じ動き %>
+        <%= link_to schedules_path, data: { turbo_frame: "_top" }, class: "text-gray-400 hover:text-gray-600" do %>
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        <% end %>
+      </div>
+
+      <%# フォーム本体 %>
+      <%= form_with(model: @event, url: schedules_path, data: { turbo_frame: "_top" }, class: "p-6 space-y-4") do |f| %>
+        <div>
+          <%= f.label :title, "タイトル", class: "block text-sm font-semibold text-gray-700 mb-1" %>
+          <%= f.text_field :title, placeholder: "例：会議、ランチなど", class: "w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500" %>
+        </div>
+
+        <div>
+          <%= f.label :start_time, "開始日時", class: "block text-sm font-semibold text-gray-700 mb-1" %>
+          <%= f.datetime_field :start_time, class: "w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500" %>
+        </div>
+
+        <div>
+          <%= f.label :content, "メモ", class: "block text-sm font-semibold text-gray-700 mb-1" %>
+          <%= f.text_area :content, rows: 3, class: "w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500" %>
+        </div>
+
+        <%# ボタンエリア %>
+        <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
+          <%= link_to "キャンセル", schedules_path, 
+              data: { turbo_frame: "_top" }, 
+              class: "px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition" %>
+          <%= f.submit "保存する", 
+              class: "px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-md transition" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>

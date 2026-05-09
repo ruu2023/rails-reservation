@@ -1,0 +1,14 @@
+<%= turbo_frame_tag "calendar_frame" do %>
+    <%= month_calendar(events: @events) do |date, events| %>
+    <div class="flex justify-between items-start">
+    <%# 日付の数字 %>
+    <span class="text-sm font-medium text-gray-600"><%= date.day %></span>
+    <%= link_to "+", new_schedule_path(date: date), 
+        class: "text-xs bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded hover:bg-blue-100 transition",
+        data: { turbo_frame: "modal" } %>
+    </div>
+      <% events.each do |event| %>
+        <div><%= event.title %></div>
+      <% end %>
+    <% end %>
+<% end %>

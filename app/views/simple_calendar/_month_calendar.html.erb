@@ -1,0 +1,32 @@
+<div class="bg-white p-4 rounded-lg shadow">
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="text-xl font-bold text-gray-800"><%= t('date.month_names')[start_date.month] %> <%= start_date.year %></h2>
+    <div class="space-x-2">
+      <%= link_to t('simple_calendar.previous', default: '前月'), calendar.url_for_previous_view, class: "px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded text-sm transition" %>
+      <%= link_to t('simple_calendar.next', default: '次月'), calendar.url_for_next_view, class: "px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded text-sm transition" %>
+    </div>
+  </div>
+
+  <table class="w-full border-collapse border border-gray-200 table-fixed">
+    <thead>
+      <tr>
+        <% date_range.slice(0, 7).each do |day| %>
+          <th class="p-2 border border-gray-200 bg-gray-50 text-xs font-semibold text-gray-600 uppercase tracking-wider">
+            <%= t('date.abbr_day_names')[day.wday] %>
+          </th>
+        <% end %>
+      </tr>
+    </thead>
+    <tbody>
+      <% date_range.each_slice(7) do |week| %>
+        <tr>
+          <% week.each do |day| %>
+            <%= content_tag :td, class: "h-32 border border-gray-200 p-1 align-top hover:bg-gray-50 transition #{calendar.td_classes_for(day)}" do %>
+              <% instance_exec(day, calendar.sorted_events_for(day), &passed_block) %>
+            <% end %>
+          <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
