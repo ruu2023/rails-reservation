@@ -9,7 +9,10 @@ class EventsController < ApplicationController
     end
   end
   def index
-    @events = Event.all()
+    # @events = Event.all()
+    # controllerで表示期間を制御
+    @start_date = params.fetch(:start_date, Date.today).to_date
+    @events = Event.where(start_time: @start_date.beginning_of_week..@start_date.advance(weeks: 2).end_of_week)
   end
 
   def create

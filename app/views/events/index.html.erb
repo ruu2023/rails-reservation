@@ -1,24 +1,22 @@
-<%= turbo_frame_tag "calendar_frame" do %>
-  <%= month_calendar(events: @events) do |date, events| %>
-    <div class="flex justify-between">
-      <span class="text-xs sm:text-sm"><%= date.day %></span>
-      <%= link_to "+", new_event_path(date: date), 
-          class: "text-md bg-blue-50 text-blue-600 px-2 py-0.5 rounded hover:bg-blue-100 transition",
-          data: { turbo_frame: "modal" } %>
-    </div>
-    <%# PCのみ表示（md:block）、スマホでは非表示（hidden） %>
-    <div class="hidden md:block mt-1">
-      <% events.slice(0, 2).each do |event| %>
-        <div class="truncate text-[10px] bg-blue-100 text-blue-800 p-0.5 mb-0.5 rounded">
-          <%= event.title %>
+<div class="overflow-x-auto"> <%# 横スクロールを許可 %>
+  <div class="min-w-[600px]"> <%# スマホでも無理やり600px確保して「マス」を維持 %>
+    <%= month_calendar(events: @events) do |date, events| %>
+      <div class="h-24 sm:h-32 flex flex-col border-t border-gray-100">
+        <%# 日付の数字 %>
+        <span class="text-[10px] font-bold text-gray-400 p-1"><%= date.day %></span>
+        <%# 予定（名前）を直接表示 %>
+        <div class="grow space-y-0.5 px-1 overflow-y-auto">
+          <% events.each do |event| %>
+            <div class="text-[11px] leading-tight bg-blue-50 text-blue-700 px-1 py-0.5 rounded border border-blue-100 truncate shadow-sm">
+              <%= event.title %>
+            </div>
+          <% end %>
+          <%# ＋ボタン（空きスペースをタップしやすく） %>
+          <%= link_to "+", new_event_path(date: date), 
+              data: { turbo_frame: "modal" },
+              class: "block text-center text-gray-300 hover:text-blue-500 text-xs py-1" %>
         </div>
-      <% end %>
-    </div>
-    <%# スマホのみ：予定がある日に「ドット」だけ表示 %>
-    <% if events.any? %>
-      <div class="md:hidden flex justify-center mt-1">
-        <div class="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
       </div>
     <% end %>
-  <% end %>
-<% end %>
+  </div>
+</div>
