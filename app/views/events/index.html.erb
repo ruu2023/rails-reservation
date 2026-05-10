@@ -7,9 +7,11 @@
         <%# 予定（名前）を直接表示 %>
         <div class="grow space-y-0.5 px-1 overflow-y-auto">
           <% events.each do |event| %>
-            <div class="text-[11px] leading-tight bg-blue-50 text-blue-700 px-1 py-0.5 rounded border border-blue-100 truncate shadow-sm">
-              <%= event.title %>
-            </div>
+            <%= link_to edit_event_path(event), data: { turbo_frame: "modal" }, class: "block" do %>
+              <div class="text-[11px] leading-tight bg-blue-50 text-blue-700 px-1 py-0.5 rounded border border-blue-100 truncate shadow-sm">
+                <%= event.title %>
+              </div>
+            <% end %>
           <% end %>
           <%# ＋ボタン（空きスペースをタップしやすく） %>
           <%= link_to "+", new_event_path(date: date), 

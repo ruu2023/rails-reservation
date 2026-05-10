@@ -70,3 +70,8 @@ group :test do
 end
 
 gem "tailwindcss-rails", "~> 4.4"
+
+
+
+gem "omniauth-google-oauth2"
+gem "omniauth-rails_csrf_protection" # セキュリティ対策

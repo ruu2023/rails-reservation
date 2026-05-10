@@ -1,0 +1,9 @@
+<div class="h-dvh flex items-center justify-center bg-gray-50">
+  <div class="max-w-md w-full p-8 bg-white rounded-2xl shadow-xl text-center">
+    <h1 class="text-2xl font-bold text-gray-800 mb-6">Calendar App</h1>
+    <%= button_to "/auth/google_oauth2", data: { turbo: false }, class: "w-full flex items-center justify-center gap-3 px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium" do %>
+      <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" class="w-5 h-5">
+      Googleでログイン
+    <% end %>
+  </div>
+</div>
