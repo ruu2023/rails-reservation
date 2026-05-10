@@ -12,10 +12,13 @@
   </div>
   <%# 3. 本体エリア：ここにも min-h-0 が必須 %>
   <div class="flex-1 flex flex-col min-h-0 border-l border-b border-gray-200">
-    <%# 曜日ヘッダー %>
-    <div class="grid grid-cols-7 bg-gray-50 border-t border-gray-200 flex-none">
+    <%# 曜日ヘッダー部分 %>
+    <div class="grid grid-cols-7 bg-gray-50 border-t border-b-2 border-gray-200 flex-none">
       <% date_range.slice(0, 7).each do |day| %>
-        <div class="py-2 text-[10px] font-bold text-center text-gray-500 uppercase border-r border-gray-200">
+        <div class="py-2 text-[10px] font-bold text-center uppercase border-r border-gray-200 
+                <%= 'text-red-500' if day.sunday? %> 
+                <%= 'text-blue-500' if day.saturday? %> 
+                <%= 'text-gray-500' unless day.saturday? || day.sunday? %>">
           <%= t('date.abbr_day_names')[day.wday] %>
         </div>
       <% end %>
@@ -29,13 +32,13 @@
         <div class="border-t border-r border-gray-200 relative flex flex-col min-h-0 bg-white">
           <%# スクロールエリア：ここだけが回る %>
           <div class="flex-1 overflow-y-auto custom-scrollbar min-h-0">
-            <div class="flex justify-end py-0.5 sticky top-0 z-10">
-              <% text_color = case day.wday
-                when 0 then "bg-red-100"
-                when 6 then "bg-blue-100"
-                else "bg-white"
-                end %>
-              <span class="w-6 h-6 flex items-center justify-center rounded-full border text-gray-600 border-gray-100 text-[10px] font-medium <%= text_color %>">
+            <div class="flex justify-between py-0.5 sticky top-0 z-10">
+              <%# 祝日名：白縁取りで背後の予定と重なっても読めるようにする %>
+              <span class="text-[9px] text-red-500 p-1 font-bold truncate max-w-[65%]"
+        style="text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 0 0 4px #fff;">
+                <%= holiday_name(day) %>
+              </span>
+              <span class="w-6 h-6 flex items-center justify-center rounded-full border text-gray-600 border-gray-100 text-[10px] font-medium <%= date_class(day) %>">
                 <%= day.day %>
               </span>
             </div>

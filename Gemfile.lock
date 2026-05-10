@@ -133,6 +133,7 @@ GEM
       activesupport (>= 6.1)
     hashie (5.1.0)
       logger
+    holiday_jp (0.8.1)
     htmlbeautifier (1.4.3)
     i18n (1.14.8)
       concurrent-ruby (~> 1.0)
@@ -452,6 +453,7 @@ DEPENDENCIES
   bundler-audit
   capybara
   debug
+  holiday_jp
   htmlbeautifier
   image_processing (~> 1.2)
   importmap-rails
