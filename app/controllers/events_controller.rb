@@ -1,4 +1,6 @@
 class EventsController < ApplicationController
+  # 全アクションでまずログインチェックをする
+  before_action :authenticate_user!
   before_action :set_event, only: %i[edit update destroy]
   def new
     @event = Event.new
@@ -10,16 +12,18 @@ class EventsController < ApplicationController
     end
   end
   def index
-    # 表示基準日（なければ今日）
-    @start_date = params.fetch(:start_date, Date.today).to_date
+    @start_date = params.fetch(:start_date, Date.today).to_date.in_time_zone
 
-    # 表示している月の「月初」から「月末」までをDBから取ってくる
-    # all_month を使うと Rails がよしなに範囲を作ってくれます
-    @events = Event.where(start_time: @start_date.all_month)
+    # カレンダーが表示する全期間（前後の月のはみ出し分を含む）を計算
+    # beginning_of_month (月初) -> beginning_of_week (その週の月曜)
+    # end_of_month (月末) -> end_of_week (その週の日曜)
+    range = @start_date.beginning_of_month.beginning_of_week..@start_date.end_of_month.end_of_week
+
+    @events = current_user.events.where(start_time: range)
   end
 
   def create
-    @event = Event.new(event_params)
+    @event = current_user.events.build(event_params)
     if @event.save
       # 登録したイベントの開始日を start_date パラメータとして渡す
       redirect_to events_path(start_date: @event.start_time), notice: "予約を登録しました"
@@ -51,7 +55,7 @@ class EventsController < ApplicationController
   private
 
   def set_event
-    @event = Event.find(params[:id])
+    @event = current_user.events.find(params[:id])
   end
 
   def event_params

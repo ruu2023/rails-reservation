@@ -1,4 +1,5 @@
 class Event < ApplicationRecord
+  belongs_to :user
   # 1. タイトルは必須（空だと「紙」に書き込めない）
   validates :title, presence: true, length: { maximum: 50 }
 
