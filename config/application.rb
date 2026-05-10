@@ -14,5 +14,6 @@ module RailsReservation
     config.autoload_lib(ignore: %w[assets tasks])
     config.i18n.default_locale = :ja
     config.time_zone = "Tokyo" # ついでにタイムゾーンも日本にしておくと便利です
+    config.beginning_of_week = :sunday
   end
 end

@@ -1,24 +1,23 @@
-<div class="container mx-auto md:px-5 flex overflow-x-auto"> <%# 横スクロールを許可 %>
-  <div class="min-w-[600px]"> <%# スマホでも無理やり600px確保して「マス」を維持 %>
-    <%= month_calendar(events: @events) do |date, events| %>
-      <div class="h-24 sm:h-32 flex flex-col border-t border-gray-100">
-        <%# 日付の数字 %>
-        <span class="text-[10px] font-bold text-gray-400 p-1"><%= date.day %></span>
-        <%# 予定（名前）を直接表示 %>
-        <div class="grow space-y-0.5 px-1 overflow-y-auto">
+<div class="container mx-auto md:px-5">
+  <%# 横スクロールが必要な場合は、カレンダー自体を囲う %>
+  <div class="overflow-x-auto h-dvh">
+    <div class="min-w-[600px] h-full">
+      <%= month_calendar(events: @events, start_day: :sunday) do |date, events| %>
+        <%# パーシャルの instance_exec からここに中身が入る %>
+        <div class="space-y-1 px-0.5">
           <% events.each do |event| %>
             <%= link_to edit_event_path(event), data: { turbo_frame: "modal" }, class: "block" do %>
-              <div class="text-[11px] leading-tight bg-blue-50 text-blue-700 px-1 py-0.5 rounded border border-blue-100 truncate shadow-sm">
+              <div class="text-[11px] leading-tight bg-blue-50 text-blue-700 px-1 py-0.5 rounded border border-blue-100 truncate hover:bg-blue-100">
                 <%= event.title %>
               </div>
             <% end %>
           <% end %>
-          <%# ＋ボタン（空きスペースをタップしやすく） %>
+          <%# ＋ボタン %>
           <%= link_to "+", new_event_path(date: date), 
               data: { turbo_frame: "modal" },
               class: "block text-center text-gray-300 hover:text-blue-500 text-xs py-1" %>
         </div>
-      </div>
-    <% end %>
+      <% end %>
+    </div>
   </div>
 </div>

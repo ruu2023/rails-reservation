@@ -1,44 +1,49 @@
-<%# 1. コンテナを画面ぴったりに固定（overflow-hiddenでスクロールを封印） %>
-<div class="h-dvh flex flex-col bg-white overflow-hidden md:p-4">
-  <%# 2. ヘッダー部分は「必要な分だけ」取る（flex-none） %>
-  <div class="flex-none flex items-center justify-between p-4">
+<%# 1. コンテナ：h-dvhで画面高さを固定、overflow-hiddenで全体スクロールを禁止 %>
+<div class="h-dvh flex flex-col bg-white overflow-hidden">
+  <%# 2. ヘッダー：高さ固定 %>
+  <div class="flex-none flex items-center justify-start p-4 border-b">
     <h2 class="text-xl font-bold text-gray-800">
       <%= t('date.month_names')[start_date.month] %> <%= start_date.year %>
     </h2>
-    <div class="space-x-2 flex">
+    <div class="space-x-2 ml-20 flex">
       <%= link_to "前", calendar.url_for_previous_view, class: "px-3 py-1 bg-gray-100 rounded text-sm" %>
       <%= link_to "次", calendar.url_for_next_view, class: "px-3 py-1 bg-gray-100 rounded text-sm" %>
     </div>
   </div>
-  <%# 3. テーブル本体。「flex-1」と「min-h-0」で、残りの高さを1pxの狂いもなく埋める %>
-  <div class="flex-1 min-h-0 w-full">
-    <table class="w-full h-full border-collapse border border-gray-200 table-fixed">
-      <thead>
-        <%# 曜日の高さは固定（例：h-10 = 2.5rem） %>
-        <tr class="h-10">
-          <% date_range.slice(0, 7).each do |day| %>
-            <th class="border border-gray-200 bg-gray-50 text-[10px] font-bold text-gray-500 uppercase tracking-tighter">
-              <%= t('date.abbr_day_names')[day.wday] %>
-            </th>
-          <% end %>
-        </tr>
-      </thead>
-      <tbody class="h-full">
-        <% row_count = date_range.size / 7 %>
-        <% date_range.each_slice(7) do |week| %>
-          <%# 100%を週数で割る。ここでの100%は「tbody全体の高さ」を指す %>
-          <tr style="height: <%= 100.0 / row_count %>%;">
-            <% week.each do |day| %>
-              <td class="border border-gray-200 p-0 align-top hover:bg-gray-50 transition <%= calendar.td_classes_for(day) %> relative">
-                <%# 中身もh-fullにすることで、マス全体をタップ領域にできる %>
-                <div class="w-full h-full overflow-hidden">
-                  <% instance_exec(day, calendar.sorted_events_for(day), &passed_block) %>
-                </div>
-              </td>
-            <% end %>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
+  <%# 3. 本体エリア：ここにも min-h-0 が必須 %>
+  <div class="flex-1 flex flex-col min-h-0 border-l border-b border-gray-200">
+    <%# 曜日ヘッダー %>
+    <div class="grid grid-cols-7 bg-gray-50 border-t border-gray-200 flex-none">
+      <% date_range.slice(0, 7).each do |day| %>
+        <div class="py-2 text-[10px] font-bold text-center text-gray-500 uppercase border-r border-gray-200">
+          <%= t('date.abbr_day_names')[day.wday] %>
+        </div>
+      <% end %>
+    </div>
+    <%# 4. グリッド本体：min-h-0 と minmax(0, 1fr) で、中身に負けず等分を維持 %>
+    <% row_count = date_range.size / 7 %>
+    <div class="grid grid-cols-7 grow min-h-0" 
+         style="grid-template-rows: repeat(<%= row_count %>, minmax(0, 1fr));">
+      <% date_range.each do |day| %>
+        <%# 各マス：min-h-0 を指定 %>
+        <div class="border-t border-r border-gray-200 relative flex flex-col min-h-0 bg-white">
+          <%# スクロールエリア：ここだけが回る %>
+          <div class="flex-1 overflow-y-auto custom-scrollbar min-h-0">
+            <div class="flex justify-end py-0.5 sticky top-0 z-10">
+              <% text_color = case day.wday
+                when 0 then "bg-red-100"
+                when 6 then "bg-blue-100"
+                else "bg-white"
+                end %>
+              <span class="w-6 h-6 flex items-center justify-center rounded-full border text-gray-600 border-gray-100 text-[10px] font-medium <%= text_color %>">
+                <%= day.day %>
+              </span>
+            </div>
+            <%# ここで index.html.erb のブロックを呼び出す %>
+            <% instance_exec(day, calendar.sorted_events_for(day), &passed_block) %>
+          </div>
+        </div>
+      <% end %>
+    </div>
   </div>
 </div>
