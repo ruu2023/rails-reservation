@@ -49,3 +49,4 @@ asset_path: /rails/public/assets
 
 builder:
   arch: amd64
+  remote: ssh://deploy@162.43.77.16
