@@ -7,12 +7,16 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get create" do
-    get sessions_create_url
-    assert_response :success
+    # 偽のGoogleレスポンスをセット
+    mock_google_auth
+
+    # Googleからのコールバックをシミュレート
+    get "/auth/google_oauth2/callback"
+    assert_redirected_to events_url
   end
 
   test "should get destroy" do
     get sessions_destroy_url
-    assert_response :success
+    assert_redirected_to root_url
   end
 end
