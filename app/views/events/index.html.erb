@@ -7,7 +7,7 @@
         <div class="space-y-1 px-0.5">
           <% events.each do |event| %>
             <%= link_to edit_event_path(event), data: { turbo_frame: "modal" }, class: "block" do %>
-              <div class="text-[11px] leading-tight bg-blue-50 text-blue-700 px-1 py-0.5 rounded border border-blue-100 truncate hover:bg-blue-100">
+              <div class="text-[11px] md:text-lg leading-tight bg-blue-50 text-blue-700 px-1 py-0.5 rounded border border-blue-100 truncate hover:bg-blue-100">
                 <span class="font-bold text-gray-500">
                   <%#= event.start_time.strftime("%H:%M") %>
                 </span>

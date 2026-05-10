@@ -15,7 +15,7 @@
     <%# 曜日ヘッダー部分 %>
     <div class="grid grid-cols-7 bg-gray-50 border-t border-b-2 border-gray-200 flex-none">
       <% date_range.slice(0, 7).each do |day| %>
-        <div class="py-2 text-[10px] font-bold text-center uppercase border-r border-gray-200 
+        <div class="py-2 text-[10px] md:text-lg font-bold text-center uppercase border-r border-gray-200 
                 <%= 'text-red-500' if day.sunday? %> 
                 <%= 'text-blue-500' if day.saturday? %> 
                 <%= 'text-gray-500' unless day.saturday? || day.sunday? %>">
@@ -38,7 +38,7 @@
         style="text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 0 0 4px #fff;">
                 <%= holiday_name(day) %>
               </span>
-              <span class="w-6 h-6 flex items-center justify-center rounded-full border text-gray-600 border-gray-100 text-[10px] font-medium <%= date_class(day) %>">
+              <span class="w-6 h-6 flex items-center justify-center rounded-full border text-gray-600 border-gray-100 text-[10px] md:text-lg font-medium <%= date_class(day) %>">
                 <%= day.day %>
               </span>
             </div>
