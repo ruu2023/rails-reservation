@@ -2,23 +2,38 @@
   <%# 横スクロールが必要な場合は、カレンダー自体を囲う %>
   <div class="overflow-x-auto h-dvh">
     <div class="min-w-[600px] h-full">
-      <%= month_calendar(events: @events, start_day: :sunday) do |date, events| %>
-        <%# パーシャルの instance_exec からここに中身が入る %>
+      <%= month_calendar(events: @events, attribute: :start_time, end_attribute: :end_time) do |date, events| %>
         <div class="space-y-1 px-0.5">
           <% events.each do |event| %>
+            <%
+              # 簡易的な判定（複数日予定かどうか）
+              is_multi_day = event.end_time.present? && (event.end_time.to_date > event.start_time.to_date)
+              is_start = is_multi_day && date == event.start_time.to_date
+              is_end = is_multi_day && date == event.end_time.to_date
+              is_middle = is_multi_day && date > event.start_time.to_date && date < event.end_time.to_date
+              
+              # 状態によって丸みを出し分ける
+              rounded_class = case
+                              when is_start then "rounded-l-lg rounded-r-none ml-0.5"
+                              when is_end then "rounded-r-lg rounded-l-none mr-0.5"
+                              when is_middle then "rounded-none"
+                              else "rounded-lg" # 単発予定
+                              end
+            %>
             <%= link_to edit_event_path(event), data: { turbo_frame: "modal" }, class: "block" do %>
-              <div class="text-[11px] md:text-lg leading-tight bg-blue-50 text-blue-700 px-1 py-0.5 rounded border border-blue-100 truncate hover:bg-blue-100">
-                <span class="font-bold text-gray-500">
-                  <%#= event.start_time.strftime("%H:%M") %>
-                </span>
-                <%= event.title %>
+              <div class="text-[10px] md:text-sm leading-tight bg-blue-50 text-blue-700  px-2 py-1 shadow-sm truncate hover:bg-blue-100 transition-colors <%= rounded_class %>">
+                <%# 開始日だけタイトルを表示するとスッキリします %>
+                <% if !is_middle && !is_end %>
+                  <span class="font-bold"><%= event.title %></span>
+                <% elsif !is_multi_day %>
+                  <%= event.title %>
+                <% end %>
+                &nbsp; <%# 空白を入れて高さを維持 %>
               </div>
             <% end %>
           <% end %>
           <%# ＋ボタン %>
-          <%= link_to "+", new_event_path(date: date), 
-              data: { turbo_frame: "modal" },
-              class: "block text-center text-gray-300 hover:text-blue-500 text-sm py-1" %>
+          <%= link_to "+", new_event_path(date: date), data: { turbo_frame: "modal" }, class: "block text-center text-gray-300 hover:text-blue-500 text-sm py-1" %>
         </div>
       <% end %>
     </div>

@@ -93,32 +93,32 @@ ja:
   errors:
     format: "%{attribute}%{message}"
     messages:
-      accepted: を受諾してください
-      blank: を入力してください
-      confirmation: と%{attribute}の入力が一致しません
-      empty: を入力してください
-      equal_to: は%{count}にしてください
-      even: は偶数にしてください
-      exclusion: は予約されています
-      greater_than: は%{count}より大きい値にしてください
-      greater_than_or_equal_to: は%{count}以上の値にしてください
-      in: は%{count}の範囲に含めてください
-      inclusion: は一覧にありません
-      invalid: は不正な値です
-      less_than: は%{count}より小さい値にしてください
-      less_than_or_equal_to: は%{count}以下の値にしてください
-      model_invalid: "バリデーションに失敗しました: %{errors}"
-      not_a_number: は数値で入力してください
-      not_an_integer: は整数で入力してください
-      odd: は奇数にしてください
-      other_than: は%{count}以外の値にしてください
-      password_too_long: が長すぎます
-      present: は入力しないでください
-      required: を入力してください
-      taken: はすでに存在します
-      too_long: は%{count}文字以内で入力してください
-      too_short: は%{count}文字以上で入力してください
-      wrong_length: は%{count}文字で入力してください
+      accepted: "を受諾してもらえるとうれしいです"
+      blank: "を入力してくださいね"
+      confirmation: "が%{attribute}と一致していないみたいです"
+      empty: "が空っぽですよ"
+      equal_to: "は%{count}ぴったりにしてください"
+      even: "は偶数（2, 4, 6...）にしてください"
+      exclusion: "はすでに使われていて、選べないみたいです"
+      greater_than: "は%{count}より大きくしてくださいね"
+      greater_than_or_equal_to: "は%{count}以上にしてください"
+      in: "は%{count}の範囲内で教えてください"
+      inclusion: "はリストにないみたいです"
+      invalid: "がちょっと正しくないみたいです"
+      less_than: "は%{count}より小さくしてくださいね"
+      less_than_or_equal_to: "は%{count}以下にしてください"
+      model_invalid: "おっと、入力内容を確認してくださいね: %{errors}"
+      not_a_number: "は数字で教えてください"
+      not_an_integer: "は整数（1, 2, 3...）にしてください"
+      odd: "は奇数（1, 3, 5...）にしてください"
+      other_than: "は%{count}以外にしてください"
+      password_too_long: "が少し長すぎるみたいです"
+      present: "は空欄のままにしてくださいね"
+      required: "は必須項目ですよ"
+      taken: "はすでに誰かが使っているみたいです"
+      too_long: "は%{count}文字以内におさめてください"
+      too_short: "は%{count}文字以上で教えてください"
+      wrong_length: "は%{count}文字ぴったりにしてください"
     template:
       body: 次の項目を確認してください
       header: "%{model}に%{count}個のエラーが発生しました"
