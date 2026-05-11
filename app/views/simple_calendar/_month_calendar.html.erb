@@ -2,12 +2,24 @@
 <div class="h-dvh flex flex-col bg-white overflow-hidden">
   <%# 2. ヘッダー：高さ固定 %>
   <div class="flex-none flex items-center justify-start p-4 border-b">
-    <h2 class="text-xl font-bold text-gray-800">
-      <%= t('date.month_names')[start_date.month] %> <%= start_date.year %>
-    </h2>
-    <div class="space-x-2 ml-20 flex">
-      <%= link_to "前", calendar.url_for_previous_view, class: "px-3 py-1 bg-gray-100 rounded text-sm" %>
-      <%= link_to "次", calendar.url_for_next_view, class: "px-3 py-1 bg-gray-100 rounded text-sm" %>
+    <div class="flex flex-col">
+      <h2 class="text-3xl font-black text-gray-800 leading-none">
+        <%= t('date.month_names')[start_date.month] %> <span class="text-xl font-light text-gray-400"><%= start_date.year %></span>
+      </h2>
+    </div>
+    <div class="flex items-center space-x-2 ml-20">
+      <%= link_to calendar.url_for_previous_view, class: "flex items-center px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 shadow-sm" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        前
+      <% end %>
+      <%= link_to calendar.url_for_next_view, class: "flex items-center px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 shadow-sm" do %>
+        次
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      <% end %>
     </div>
   </div>
   <%# 3. 本体エリア：ここにも min-h-0 が必須 %>
@@ -34,7 +46,7 @@
           <div class="flex-1 overflow-y-auto custom-scrollbar min-h-0">
             <div class="flex justify-between py-0.5 sticky top-0 z-10">
               <%# 祝日名：白縁取りで背後の予定と重なっても読めるようにする %>
-              <span class="text-[9px] text-red-500 p-1 font-bold truncate max-w-[65%]"
+              <span class="text-[9px] md:text-sm text-red-500 p-1 font-bold truncate max-w-[65%]"
         style="text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 0 0 4px #fff;">
                 <%= holiday_name(day) %>
               </span>

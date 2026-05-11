@@ -11,27 +11,45 @@
       <%# フォーム本体 %>
       <%= form_with(model: @event, data: { turbo_frame: "_top" }, class: "p-6 space-y-4") do |f| %>
         <% if @event.errors.any? %>
-          <div class="p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg animate-shake">
-            <%= @event.errors.count %>件のエラーがあります。
+          <div class="relative p-4 bg-white border-2 border-pink-100 rounded-xl shadow-sm">
+            <div class="flex items-center space-x-2 text-pink-600">
+              <span class="text-lg font-mono block">₍ᐢ‥ᐢ₎</span>
+              <span class="font-medium text-sm block">
+                <%= @event.errors.count %>箇所、<br />
+                直してもらえるとうれしいです
+              </span>
+            </div>
           </div>
         <% end %>
-        <div>
-          <%= f.label :title, "タイトル", class: "block text-sm font-semibold text-gray-700 mb-1" %>
-          <%= f.text_field :title, placeholder: "例：会議、ランチなど", class: "w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500" %>
-          <% if @event.errors[:title].any? %>
-            <p class="mt-1 text-xs text-red-600"><%= @event.errors.full_messages_for(:title).first %></p>
-          <% end %>
-        </div>
-        <div>
-          <%= f.label :start_time, "開始日時", class: "block text-sm font-semibold text-gray-700 mb-1" %>
-          <%= f.datetime_field :start_time, class: "w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500" %>
-          <% if @event.errors[:start_time].any? %>
-            <p class="mt-1 text-xs text-red-600"><%= @event.errors.full_messages_for(:start_time).first %></p>
-          <% end %>
-        </div>
-        <div>
-          <%= f.label :content, "メモ", class: "block text-sm font-semibold text-gray-700 mb-1" %>
-          <%= f.text_area :content, rows: 3, class: "w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500" %>
+        <div class="space-y-6"> <%# 各入力項目の間にゆとりを持たせる %>
+          <%# タイトル %>
+          <div>
+            <%= f.label :title, "タイトル", class: "block text-sm font-bold text-gray-600 mb-2 ml-1" %>
+            <%= f.text_field :title, placeholder: "例：外乗、十勝など", 
+        class: "w-full px-4 py-3 border-gray-200 rounded-xl shadow-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all placeholder:text-gray-300" %>
+            <% if @event.errors[:title].any? %>
+              <p class="mt-2 ml-1 text-sm text-pink-500 flex items-center">
+                <%= @event.errors.full_messages_for(:title).first %>
+              </p>
+            <% end %>
+          </div>
+          <%# 開始日時 %>
+          <div>
+            <%= f.label :start_time, "開始日時", class: "block text-sm font-bold text-gray-600 mb-2 ml-1" %>
+            <%= f.datetime_field :start_time, 
+        class: "w-full px-4 py-3 border-gray-200 rounded-xl shadow-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all color-scheme-light" %>
+            <% if @event.errors[:start_time].any? %>
+              <p class="mt-2 ml-1 text-sm text-pink-500 flex items-center">
+                <%= @event.errors.full_messages_for(:start_time).first %>
+              </p>
+            <% end %>
+          </div>
+          <%# メモ %>
+          <div>
+            <%= f.label :content, "メモ", class: "block text-sm font-bold text-gray-600 mb-2 ml-1" %>
+            <%= f.text_area :content, rows: 4, placeholder: "どんな予定ですか？",
+        class: "w-full px-4 py-3 border-gray-200 rounded-xl shadow-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all resize-none" %>
+          </div>
         </div>
         <div class="flex items-center justify-between pt-4 border-t border-gray-100">
           <% if show_delete %>
@@ -56,7 +74,7 @@
               </svg>
             <% end %>
             <%= f.button type: :submit, 
-                class: "inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-sm transition-all active:scale-95" do %>
+                class: "inline-flex items-center gap-2 px-6 py-2.5 md:text-lg text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-sm transition-all active:scale-95" do %>
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
                 <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
               </svg>

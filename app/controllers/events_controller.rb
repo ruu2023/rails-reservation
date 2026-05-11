@@ -8,7 +8,7 @@ class EventsController < ApplicationController
     # パラメータに日付があれば、開始時間の初期値としてセットする
     if params[:date].present?
       # Time.zone.parse を使って安全に日時に変換
-      @event.start_time = Time.zone.parse(params[:date]).beginning_of_day
+      @event.start_time = Time.zone.parse(params[:date]).beginning_of_day.change(hour: 10)
     end
   end
   def index
