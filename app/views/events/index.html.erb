@@ -1,35 +1,69 @@
 <div class="container mx-auto md:px-5">
-  <%# 横スクロールが必要な場合は、カレンダー自体を囲う %>
   <div class="overflow-x-auto h-dvh">
     <div class="min-w-[600px] h-full">
-      <%= month_calendar(events: @events, attribute: :start_time, end_attribute: :end_time) do |date, events| %>
+      <%# --- 事前準備: カレンダー全体の予定を日付ごとの「行（レーン）」にマッピングする --- %>
+      <%
+        # 日付ごとの予定配置用ハッシュ { Date => [event1, nil, event2] } のような形を作る
+        # ※ @events は事前に start_time 昇順、期間が長い順などでソートされていると綺麗に収まりやすいです
+        calendar_lanes = Hash.new { |h, k| h[k] = [] }
+        
+        # 簡易的なレーン割り当てロジック
+        @events.each do |event|
+          start_d = event.start_time.to_date
+          end_d = event.end_time.present? ? event.end_time.to_date : start_d
+          
+          # このイベントが占有する全日程
+          event_dates = (start_d..end_d).to_a
+          
+          # 空いている共通のレーン番号（インデックス）を探す
+          lane_idx = 0
+          loop do
+            overlap = event_dates.any? { |d| calendar_lanes[d][lane_idx].present? }
+            break unless overlap
+            lane_idx += 1
+          end
+          
+          # 期間内の全日程のそのレーンにイベントを配置
+          event_dates.each do |d|
+            calendar_lanes[d][lane_idx] = event
+          end
+        end
+      %>
+      <%= month_calendar(events: @events, attribute: :start_time, end_attribute: :end_time) do |date, _unused_events| %>
         <div class="space-y-1 px-0.5">
-          <% events.each do |event| %>
-            <%
-              # 簡易的な判定（複数日予定かどうか）
-              is_multi_day = event.end_time.present? && (event.end_time.to_date > event.start_time.to_date)
-              is_start = is_multi_day && date == event.start_time.to_date
-              is_end = is_multi_day && date == event.end_time.to_date
-              is_middle = is_multi_day && date > event.start_time.to_date && date < event.end_time.to_date
-              
-              # 状態によって丸みを出し分ける
-              rounded_class = case
-                              when is_start then "rounded-l-lg rounded-r-none ml-0.5"
-                              when is_end then "rounded-r-lg rounded-l-none mr-0.5"
-                              when is_middle then "rounded-none"
-                              else "rounded-lg" # 単発予定
-                              end
-            %>
-            <%= link_to edit_event_path(event), data: { turbo_frame: "modal" }, class: "block" do %>
-              <div class="text-[10px] md:text-sm leading-tight bg-blue-50 text-blue-700  px-2 py-1 shadow-sm truncate hover:bg-blue-100 transition-colors <%= rounded_class %>">
-                <%# 開始日だけタイトルを表示するとスッキリします %>
-                <% if !is_middle && !is_end %>
-                  <span class="font-bold"><%= event.title %></span>
-                <% elsif !is_multi_day %>
-                  <%= event.title %>
-                <% end %>
-                &nbsp; <%# 空白を入れて高さを維持 %>
-              </div>
+          <%
+            # 事前ビルドしたレーン情報から、本日の予定リストを取得（末尾のnilはトリムしない）
+            day_events = calendar_lanes[date] || []
+          %>
+          <% day_events.each do |event| %>
+            <% if event.nil? %>
+              <%# --- 空白埋め（プレースホルダー）: 他の日の連日予定がここを通っているため高さを合わせる --- %>
+              <div class="text-[10px] md:text-sm leading-tight h-[22px] md:h-[28px]"></div>
+            <% else %>
+              <%
+                is_multi_day = event.end_time.present? && (event.end_time.to_date > event.start_time.to_date)
+                is_start = is_multi_day && date == event.start_time.to_date
+                is_end = is_multi_day && date == event.end_time.to_date
+                is_middle = is_multi_day && date > event.start_time.to_date && date < event.end_time.to_date
+                
+                rounded_class = case
+                                when is_start then "rounded-l-lg rounded-r-none ml-0.5"
+                                when is_end then "rounded-r-lg rounded-l-none mr-0.5"
+                                when is_middle then "rounded-none"
+                                else "rounded-lg"
+                                end
+              %>
+              <%= link_to edit_event_path(event), data: { turbo_frame: "modal" }, class: "block" do %>
+                <div class="text-[10px] md:text-sm leading-tight bg-blue-50 text-blue-700 px-2 py-1 shadow-sm truncate hover:bg-blue-100 transition-colors <%= rounded_class %>">
+                  <%# 開始日、または単発予定の場合のみタイトルを表示 %>
+                  <% if is_start || !is_multi_day %>
+                    <span class="font-bold"><%= event.title %></span>
+                  <% else %>
+                    <%# 2日目以降は、文字を消して背景色（線）だけを繋げる %>
+                    <span class="opacity-0"><%= event.title %></span>
+                  <% end %>
+                </div>
+              <% end %>
             <% end %>
           <% end %>
           <%# ＋ボタン %>
