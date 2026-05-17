@@ -15,17 +15,19 @@ class EventsController < ApplicationController
   def index
     @start_date = params.fetch(:start_date, Date.today).to_date.in_time_zone
 
-    # カレンダーが表示する全期間（前後の月のはみ出し分を含む）を計算
-    # beginning_of_month (月初) -> beginning_of_week (その週の月曜)
-    # end_of_month (月末) -> end_of_week (その週の日曜)
     range = @start_date.beginning_of_month.beginning_of_week..@start_date.end_of_month.end_of_week
 
-    @events = current_user.events.where(start_time: range)
+    # 🚀 修正: start_time だけでなく、期間が重なるものを全て取得する
+    @events = current_user.events.where(
+      "start_time <= ? AND end_time >= ?", range.end, range.begin
+    )
   end
 
   def create
     @event = current_user.events.build(event_params)
     if @event.save
+      # 🚀 修正: 引数を @event に変更
+      broadcast_calendar_refresh(@event)
       # 登録したイベントの開始日を start_date パラメータとして渡す
       redirect_to events_path(start_date: @event.start_time), notice: "予約を登録しました"
     else
@@ -38,6 +40,8 @@ class EventsController < ApplicationController
 
   def update
     if @event.update(event_params)
+      # 🚀 修正: 引数を @event に変更
+      broadcast_calendar_refresh(@event)
       # 更新したイベントの日付を維持
       redirect_to events_path(start_date: @event.start_time), notice: "予約を更新しました"
     else
@@ -46,15 +50,61 @@ class EventsController < ApplicationController
   end
 
   def destroy
-    # 削除する前に日付を控えておく
-    saved_date = @event.start_time
+    # 🚀 変更注意: 削除すると @event のデータが消えてしまうので、
+    # 判定用に一瞬だけ dup (複製) して値を控えておく
+    event_clone = @event.dup
     @event.destroy
-    # 控えていた日付の月へ戻る
-    redirect_to events_path(start_date: saved_date), notice: "予約を削除しました", status: :see_other
+
+    # 🚀 修正: 控えておいたクローンを渡す
+    broadcast_calendar_refresh(event_clone)
+
+    redirect_to events_path(start_date: event_clone.start_time), notice: "予約を削除しました", status: :see_other
   end
 
   private
 
+  def broadcast_calendar_refresh(event)
+    # イベントの開始日・終了日（基本の2ヶ月）
+    start_month = event.start_time.to_date.beginning_of_month
+    end_month   = (event.end_time.present? ? event.end_time.to_date : start_month).beginning_of_month
+
+    # 🚀 強化：イベントが月の境界（1日前後や月末）にある場合、
+    # 前後の月を見ているカレンダー画面（はみ出し表示中）にも確実に届くよう、前後1ヶ月も対象に加える
+    target_months = [
+      start_month.prev_month,
+      start_month,
+      end_month,
+      end_month.next_month
+    ].uniq
+
+    target_months.each do |month_date|
+      start_date = month_date.in_time_zone
+      range = start_date.beginning_of_month.beginning_of_week..start_date.end_of_month.end_of_week
+
+      events = current_user.events.where(
+        "start_time <= ? AND end_time >= ?", range.end, range.begin
+      )
+
+      stream_name = "events_user_#{current_user.id}_month_#{start_date.strftime('%Y-%m')}"
+
+      renderer = ApplicationController.renderer.new(
+        http_host: "localhost:3000",
+        https: Rails.env.production?
+      )
+
+      Turbo::StreamsChannel.broadcast_replace_to(
+        stream_name,
+        target: "realtime_calendar",
+        html: renderer.render(
+          partial: "events/calendar",
+          locals: { events: events },
+          assigns: { _routes: Rails.application.routes },
+          extra_chunks: [],
+          routes: Rails.application.routes
+        )
+      )
+    end
+  end
   def set_event
     @event = current_user.events.find(params[:id])
   end
