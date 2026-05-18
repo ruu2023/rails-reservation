@@ -121,4 +121,9 @@ class EventsController < ApplicationController
   def event_params
     params.require(:event).permit(:title, :start_time, :end_time, :content)
   end
+
+  def event_params
+    # 🚀 :has_end_time を許可リストに追加
+    params.require(:event).permit(:title, :start_time, :end_time, :content, :has_end_time)
+  end
 end

@@ -152,3 +152,57 @@
   /* 念のためアニメーション開始前のチラつきを防止 */
   backface-visibility: hidden;
 }
+
+/* 🚀 タイトル全体の配置（文字の下端を揃える） */
+.fc .fc-toolbar-title {
+  display: flex !important;
+  align-items: baseline !important; /* 👈 これで文字の下端がピシッと揃います */
+  gap: 12px !important; /* 「5月」と「2026」の間のスキマ */
+}
+
+/* 「5月」の大文字・太字デザイン */
+.calendar-title-month {
+  font-size: 2rem !important; /* ガツンと大きく */
+  font-weight: 800 !important; /* 極太 */
+  color: #1e293b !important; /* 画像のようなお洒落で濃いチャコールグレー */
+}
+
+/* 「2026」の小文字・薄薄デザイン */
+.calendar-title-year {
+  font-size: 1.5rem !important; /* 5月より一回り小さく */
+  font-weight: 400 !important; /* 線の太さは細め */
+  color: #9ca3af !important; /* 洗練されたライトグレー */
+}
+
+/* 📱 スマホ（画面幅が狭いとき）は少しだけ文字を縮小して整える */
+@media (max-width: 767px) {
+  .calendar-title-month {
+    font-size: 1.6rem !important;
+  }
+  .calendar-title-year {
+    font-size: 1.2rem !important;
+  }
+}
+
+/* 🚀 リリースノート (i) ボタンのスタイリング */
+.calendar-info-btn {
+  margin-left: 8px;
+  color: #3b82f6; /* Tailwind の blue-500 */
+  font-size: 1.25rem; /* 押しやすい丁度いいサイズ */
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    transform 0.2s,
+    color 0.2s;
+}
+
+/* ホバーした時にピコッと大きくなって色が変わる演出 */
+.calendar-info-btn:hover {
+  transform: scale(1.15);
+  color: #1d4ed8; /* Tailwind の blue-700 */
+}

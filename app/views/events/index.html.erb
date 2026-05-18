@@ -9,6 +9,10 @@
 <div data-controller="calendar" 
      data-calendar-url-value="<%= events_path(format: :json) %>" 
      data-calendar-holidays-value="<%= holidays_json %>"
+     <%# 🚀 追加：リリースノートを表示したい期限（この日を過ぎると自動で消えます） %>
+     data-calendar-release-note-until-value="2026-05-19"
+     <%# 🚀 追加：アイコンをクリックした時に出したいメッセージ %>
+     data-calendar-release-note-message-value="version 1.1:リアルタイム更新追加"
      data-turbo-frame="modal" 
      class="h-screen md:p-4 p-0 flex flex-col bg-white">
   <div id="calendar-stream-container" data-action="turbo:before-stream-render@document->calendar#refresh">

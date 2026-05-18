@@ -48,19 +48,17 @@
       },
       class: "w-full px-4 py-3 border-gray-200 rounded-xl shadow-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all color-scheme-light" %>
           </div>
-          <%# 🚀 変更：終了日時のトグルスイッチ（構造をフラットにしてTailwindのpeerを100%効かせます） %>
+          <%# 🚀 終了日時のトグルスイッチ（フラグ管理版） %>
           <div class="space-y-3">
-            <% # 1. 状態管理用の隠しチェックボックス（一意の id を明示） %>
-            <%= check_box_tag :has_end_time, "1", (@event.persisted? && @event.end_time.present?) || @event.errors[:end_time].any?, 
-                id: "has_end_time", class: "peer sr-only" %>
-            <% # 2. スイッチ部分（peer-checked を利用して、子要素の div と丸丸のパーツを連動させます） %>
-            <label for="has_end_time" class="flex items-center space-x-3 cursor-pointer px-1 select-none w-fit group 
+            <% # 🚀 変更点：f.check_box に変更。複雑な条件式が完全に消え去りすっきりします！ %>
+            <%= f.check_box :has_end_time, class: "peer sr-only" %>
+            <% # スイッチ部分（f.check_box が生成する id "event_has_end_time" に合わせて for を修正） %>
+            <label for="event_has_end_time" class="flex items-center space-x-3 cursor-pointer px-1 select-none w-fit group 
               peer-checked:[&_div]:bg-blue-600 peer-checked:[&_div]:after:translate-x-4">
-              <% # 内部の peer-checked 特化クラスを親 label の任意指定に移行し、アニメーションを有効化 %>
               <div class="w-9 h-5 bg-gray-200 rounded-full relative transition-colors after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all shadow-inner"></div>
               <span class="text-sm font-bold text-gray-500 group-hover:text-gray-700 transition-colors">終了日時を指定する</span>
             </label>
-            <% # 3. 終了日時入力本体（🚀 ラベルを削除し、エラーメッセージのみを残してスッキリさせました） %>
+            <% # 終了日時入力本体（チェックボックスがONの時だけ表示） %>
             <div class="hidden peer-checked:block animate-backdrop">
               <% if @event.errors[:end_time].any? %>
                 <div class="mb-2 px-1">

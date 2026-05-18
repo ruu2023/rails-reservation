@@ -3,7 +3,12 @@ import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
   // 🚀 変更点：holidays: Object を追加
-  static values = { url: String, holidays: Object };
+  static values = {
+    url: String,
+    holidays: Object,
+    releaseNoteUntil: String,
+    releaseNoteMessage: String,
+  };
 
   connect() {
     const calendarEl = this.element.querySelector("#calendar-root");
@@ -12,7 +17,6 @@ export default class extends Controller {
     if (typeof window.FullCalendar === "undefined") return;
 
     const { Calendar } = window.FullCalendar;
-
     this.calendar = new Calendar(calendarEl, {
       initialView: "dayGridMonth",
       locale: "ja",
@@ -21,6 +25,50 @@ export default class extends Controller {
       height: "100%",
       expandRows: true,
       dayMaxEvents: true,
+      dayCellContent: (info) => {
+        return info.dayNumberText.replace("日", "");
+      },
+
+      // 🚀 変更：月切り替え時のフックの中に、(i) ボタンの判定と生成を組み込みます
+      datesSet: (info) => {
+        const titleEl = document.querySelector(".fc-toolbar-title");
+        if (titleEl) {
+          const current = this.calendar.getDate();
+          const month = current.getMonth() + 1;
+          const year = current.getFullYear();
+
+          // タイトルの文字をセット
+          titleEl.innerHTML = `<span class="calendar-title-month">${month}月</span><span class="calendar-title-year">${year}</span>`;
+
+          // 🚀 期間内であれば (i) ボタンを動的に作成してタイトルの後ろにペタッと貼る
+          if (
+            this.hasReleaseNoteUntilValue &&
+            this.hasReleaseNoteMessageValue
+          ) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // 時間をリセットして日付のみで比較
+
+            const untilDate = new Date(this.releaseNoteUntilValue);
+            untilDate.setHours(0, 0, 0, 0);
+
+            // 今日が指定日付以下であればボタンを作る
+            if (today <= untilDate) {
+              const infoBtn = document.createElement("button");
+              infoBtn.type = "button";
+              infoBtn.innerHTML = "ⓘ";
+              infoBtn.className = "calendar-info-btn";
+              infoBtn.title = "リリースノートを見る"; // ホバー時のツールチップ
+
+              // クリックイベントを安全にバインド
+              infoBtn.addEventListener("click", () => {
+                alert(this.releaseNoteMessageValue); // 🚀 シンプルにメッセージを表示
+              });
+
+              titleEl.appendChild(infoBtn);
+            }
+          }
+        }
+      },
 
       // 🚀 追加：「日」の文字を消して数字だけにする
       dayCellContent: (info) => {
