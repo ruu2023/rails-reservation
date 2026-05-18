@@ -4,12 +4,14 @@
       <%# ヘッダー %>
       <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
         <h2 class="text-xl font-bold text-gray-800"><%= title %></h2>
-        <%= link_to events_path(start_date: @event.start_time), data: { turbo_frame: "_top" }, class: "text-gray-400 hover:text-gray-600" do %>
+        <%# 🚀 変更: バツボタンは単純にこのモーダル（Turbo Frame）の中身を空にするだけで閉じられます %>
+        <%= link_to events_path(start_date: @event.start_time), class: "text-gray-400 hover:text-gray-600" do %>
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
         <% end %>
       </div>
       <%# フォーム本体 %>
-      <%= form_with(model: @event, data: { turbo_frame: "_top" }, class: "p-6 space-y-4 overflow-y-auto flex-1 min-h-0") do |f| %>
+      <%# 🚀 変更: data: { turbo_frame: "_top" } を削除！これにより非同期送信（Turbo Stream）になります %>
+      <%= form_with(model: @event, class: "p-6 space-y-4 overflow-y-auto flex-1 min-h-0") do |f| %>
         <% if @event.errors.any? %>
           <div class="relative p-4 bg-white border-2 border-pink-100 rounded-xl shadow-sm">
             <div class="flex items-center space-x-2 text-pink-600">
@@ -17,13 +19,12 @@
             </div>
           </div>
         <% end %>
-        <div class="space-y-6" data-controller="time-sync"> <%# 各入力項目の間にゆとりを持たせる %>
+        <div class="space-y-6" data-controller="time-sync">
           <%# タイトル %>
           <div>
             <div class="flex items-center justify-left mb-2 px-1">
               <%= f.label :title, "タイトル", class: "text-sm font-bold text-gray-600" %>
               <% if @event.errors[:title].any? %>
-                <%# 属性名を省いたメッセージを表示 %>
                 <span class="text-sm ml-1 pt-0.5 font-medium text-pink-500">
                   <%= @event.errors[:title].first %>
                 </span>
@@ -72,8 +73,9 @@
         </div>
         <div class="flex items-center justify-between pt-4 border-t border-gray-100">
           <% if show_delete %>
+            <%# 🚀 変更: turbo_frame: "_top" を削除。コントローラー側で削除に成功すると、Turbo Stream でモーダルが自動的に閉じます %>
             <%= link_to event_path(@event), 
-                data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？", turbo_frame: "_top" }, 
+                data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？" }, 
                 class: "p-2.5 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors",
                 title: "削除" do %>
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
@@ -81,11 +83,11 @@
               </svg>
             <% end %>
           <% else %>
-            <div><%# 削除がない時も justify-between を維持するための空要素 %></div>
+            <div></div>
           <% end %>
           <div class="flex items-center gap-2">
+            <%# 🚀 変更: キャンセルボタンもバツボタン同様、このモーダル枠をクリアする形にします %>
             <%= link_to events_path(start_date: @event.start_time), 
-                data: { turbo_frame: "_top" }, 
                 class: "p-2.5 text-gray-500 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors",
                 title: "キャンセル" do %>
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">

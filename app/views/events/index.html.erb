@@ -1,3 +1,9 @@
-<%# ユーザーIDと年月（例: "events_user_1_month_2026-05"）ごとに固有のチャンネルを開く %>
-<%= turbo_stream_from "events_user_#{current_user.id}_month_#{@start_date.strftime('%Y-%m')}" %>
-<%= render "events/calendar", events: @events %>
+<%# app/views/events/index.html.erb %>
+<div data-controller="calendar" data-calendar-url-value="<%= events_path(format: :json) %>" data-turbo-frame="modal">
+  <%# 🚀 修正：data-action の後ろに `@document` を追加します %>
+  <div id="calendar-stream-container" data-action="turbo:before-stream-render@document->calendar#refresh">
+    <%= turbo_stream_from "events_user_#{current_user.id}" %>
+  </div>
+  <div id="calendar-root"></div>
+</div>
+<%= turbo_frame_tag "modal" %>
