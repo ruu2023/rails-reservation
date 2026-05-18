@@ -22,6 +22,11 @@ export default class extends Controller {
       expandRows: true,
       dayMaxEvents: true,
 
+      // 🚀 追加：「日」の文字を消して数字だけにする
+      dayCellContent: (info) => {
+        return info.dayNumberText.replace("日", "");
+      },
+
       dateClick: (info) => {
         const newEventUrl = `/events/new?date=${info.dateStr}`;
         const modalFrame = document.getElementById("modal");
@@ -54,7 +59,7 @@ export default class extends Controller {
             targetEl.style.flexDirection = "row-reverse";
             targetEl.style.justifyContent = "space-between";
             targetEl.style.alignItems = "center";
-            targetEl.style.padding = "2px 8px 0 8px";
+            targetEl.style.padding = "0px 0px 0 4px";
             targetEl.appendChild(holidayLabel);
           }
 
