@@ -1,9 +1,13 @@
 <%# app/views/events/index.html.erb %>
-<div data-controller="calendar" data-calendar-url-value="<%= events_path(format: :json) %>" data-turbo-frame="modal">
-  <%# 🚀 修正：data-action の後ろに `@document` を追加します %>
+<%# 🚀 変更点：p-4 を md:p-4 p-0 に変更してスマホでは壁ベタに %>
+<div data-controller="calendar" data-calendar-url-value="<%= events_path(format: :json) %>" data-turbo-frame="modal" class="h-screen md:p-4 p-0 flex flex-col bg-white">
   <div id="calendar-stream-container" data-action="turbo:before-stream-render@document->calendar#refresh">
     <%= turbo_stream_from "events_user_#{current_user.id}" %>
   </div>
-  <div id="calendar-root"></div>
+  <%# 🚀 変更点：横スクロールを許可するラッパーを新設 %>
+  <div class="flex-1 min-h-0 overflow-x-auto w-full">
+    <%# スマホの時は最低でも650pxの横幅を確保し、PC（md以上）では100%にフィットさせます %>
+    <div id="calendar-root" class="h-full min-w-[650px] md:min-w-0"></div>
+  </div>
 </div>
 <%= turbo_frame_tag "modal" %>

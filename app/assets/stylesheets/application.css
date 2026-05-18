@@ -29,3 +29,31 @@
 .custom-scrollbar:hover::-webkit-scrollbar-thumb {
   background: rgba(0, 0, 0, 0.2);
 }
+
+/* FullCalendar全体の文字サイズとヘッダーの余白調整 */
+.fc {
+  font-size: 14px; /* 全体的に少し文字を締める */
+}
+
+/* 🚀 月表示・ボタンがあるヘッダーエリアの隙間を狭くする */
+.fc .fc-toolbar {
+  margin-bottom: 0.5rem !important; /* カレンダーとの隙間を詰める */
+  padding: 0.5rem 0.75rem 0 0.75rem; /* 上下のパディングをタイトに */
+}
+
+/* 「2026年5月」の文字サイズをスマホに合わせて少しコンパクトに */
+.fc .fc-toolbar-title {
+  font-size: 1.25rem !important;
+  font-weight: 700;
+}
+
+/* ボタン類のサイズも少しだけタイトに（お好みで） */
+.fc .fc-button {
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.875rem !important;
+}
+
+/* 横スクロール時、スクロールバーの見た目を滑らかにする（任意） */
+.overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+}
