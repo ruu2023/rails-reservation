@@ -1,16 +1,16 @@
 <%= turbo_frame_tag "modal", data: { turbo_cache: "false" } do %>
-  <div class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all max-h-[90vh] flex flex-col">
+  <% # 🚀 変更点：末尾に `animate-backdrop` を追加 %>
+  <div class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 animate-backdrop">
+    <% # 🚀 変更点：`transition-all` を削り、末尾に `animate-modal-card` を追加 %>
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden transform max-h-[90vh] flex flex-col animate-modal-card">
       <%# ヘッダー %>
       <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
         <h2 class="text-xl font-bold text-gray-800"><%= title %></h2>
-        <%# 🚀 変更: バツボタンは単純にこのモーダル（Turbo Frame）の中身を空にするだけで閉じられます %>
         <%= link_to events_path(start_date: @event.start_time), class: "text-gray-400 hover:text-gray-600" do %>
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
         <% end %>
       </div>
-      <%# フォーム本体 %>
-      <%# 🚀 変更: data: { turbo_frame: "_top" } を削除！これにより非同期送信（Turbo Stream）になります %>
+      <%# フォーム本体（以下、中身はすべて変更なし） %>
       <%= form_with(model: @event, class: "p-6 space-y-4 overflow-y-auto flex-1 min-h-0") do |f| %>
         <% if @event.errors.any? %>
           <div class="relative p-4 bg-white border-2 border-pink-100 rounded-xl shadow-sm">
@@ -20,7 +20,6 @@
           </div>
         <% end %>
         <div class="space-y-6" data-controller="time-sync">
-          <%# タイトル %>
           <div>
             <div class="flex items-center justify-left mb-2 px-1">
               <%= f.label :title, "タイトル", class: "text-sm font-bold text-gray-600" %>
@@ -33,7 +32,6 @@
             <%= f.text_field :title, placeholder: "例：外乗、十勝など", 
         class: "w-full px-4 py-3 border-gray-200 rounded-xl shadow-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all placeholder:text-gray-300" %>
           </div>
-          <%# 開始日時 %>
           <div>
             <div class="flex items-center justify-left mb-2 px-1">
               <%= f.label :start_time, "開始日時", class: "text-sm font-bold text-gray-600" %>
@@ -50,21 +48,32 @@
       },
       class: "w-full px-4 py-3 border-gray-200 rounded-xl shadow-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all color-scheme-light" %>
           </div>
-          <%# 終了日時 %>
-          <div>
-            <div class="flex items-center justify-left mb-2 px-1">
-              <%= f.label :end_time, "終了日時", class: "text-sm font-bold text-gray-600" %>
+          <%# 🚀 変更：終了日時のトグルスイッチ（構造をフラットにしてTailwindのpeerを100%効かせます） %>
+          <div class="space-y-3">
+            <% # 1. 状態管理用の隠しチェックボックス（一意の id を明示） %>
+            <%= check_box_tag :has_end_time, "1", (@event.persisted? && @event.end_time.present?) || @event.errors[:end_time].any?, 
+                id: "has_end_time", class: "peer sr-only" %>
+            <% # 2. スイッチ部分（peer-checked を利用して、子要素の div と丸丸のパーツを連動させます） %>
+            <label for="has_end_time" class="flex items-center space-x-3 cursor-pointer px-1 select-none w-fit group 
+              peer-checked:[&_div]:bg-blue-600 peer-checked:[&_div]:after:translate-x-4">
+              <% # 内部の peer-checked 特化クラスを親 label の任意指定に移行し、アニメーションを有効化 %>
+              <div class="w-9 h-5 bg-gray-200 rounded-full relative transition-colors after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all shadow-inner"></div>
+              <span class="text-sm font-bold text-gray-500 group-hover:text-gray-700 transition-colors">終了日時を指定する</span>
+            </label>
+            <% # 3. 終了日時入力本体（🚀 ラベルを削除し、エラーメッセージのみを残してスッキリさせました） %>
+            <div class="hidden peer-checked:block animate-backdrop">
               <% if @event.errors[:end_time].any? %>
-                <span class="text-sm ml-1 pt-0.5 font-medium text-pink-500">
-                  <%= @event.errors[:end_time].first %>
-                </span>
+                <div class="mb-2 px-1">
+                  <span class="text-sm font-medium text-pink-500">
+                    <%= @event.errors[:end_time].first %>
+                  </span>
+                </div>
               <% end %>
+              <%= f.datetime_field :end_time, 
+                  data: { time_sync_target: "end" },
+                  class: "w-full px-4 py-3 border-gray-200 rounded-xl shadow-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all color-scheme-light" %>
             </div>
-            <%= f.datetime_field :end_time, 
-      data: { time_sync_target: "end" },
-      class: "w-full px-4 py-3 border-gray-200 rounded-xl shadow-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all color-scheme-light" %>
           </div>
-          <%# メモ %>
           <div>
             <%= f.label :content, "メモ", class: "block text-sm font-bold text-gray-600 mb-2 ml-1" %>
             <%= f.text_area :content, rows: 4, placeholder: "どんな予定ですか？",
@@ -73,7 +82,6 @@
         </div>
         <div class="flex items-center justify-between pt-4 border-t border-gray-100">
           <% if show_delete %>
-            <%# 🚀 変更: turbo_frame: "_top" を削除。コントローラー側で削除に成功すると、Turbo Stream でモーダルが自動的に閉じます %>
             <%= link_to event_path(@event), 
                 data: { turbo_method: :delete, turbo_confirm: "本当に削除しますか？" }, 
                 class: "p-2.5 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors",
@@ -86,7 +94,6 @@
             <div></div>
           <% end %>
           <div class="flex items-center gap-2">
-            <%# 🚀 変更: キャンセルボタンもバツボタン同様、このモーダル枠をクリアする形にします %>
             <%= link_to events_path(start_date: @event.start_time), 
                 class: "p-2.5 text-gray-500 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors",
                 title: "キャンセル" do %>

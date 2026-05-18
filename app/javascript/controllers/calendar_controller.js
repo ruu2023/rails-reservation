@@ -38,6 +38,12 @@ export default class extends Controller {
       eventClick: (info) => {
         info.jsEvent.preventDefault();
 
+        // 🚀 追加：画面内にFullCalendarのポップアップの閉じるボタン（×）があれば、プログラムからクリックして閉じる
+        const popoverCloseBtn = document.querySelector(".fc-popover-close");
+        if (popoverCloseBtn) {
+          popoverCloseBtn.click();
+        }
+
         if (info.event.url) {
           const modalFrame = document.getElementById("modal");
           if (modalFrame) {
@@ -61,7 +67,6 @@ export default class extends Controller {
       event.preventDefault();
 
       if (this.calendar) {
-        console.log("カレンダーのリアルタイム更新を実行します✨");
         this.calendar.refetchEvents(); // 👈 これでFullCalendarが最新のJSONをシュッと再取得します
       }
     }
