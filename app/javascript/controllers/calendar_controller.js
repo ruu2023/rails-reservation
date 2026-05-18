@@ -2,18 +2,17 @@
 import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
-  static values = { url: String };
+  // 🚀 変更点：holidays: Object を追加
+  static values = { url: String, holidays: Object };
 
   connect() {
     const calendarEl = this.element.querySelector("#calendar-root");
     if (!calendarEl) return;
 
-    if (typeof window.FullCalendar === "undefined") {
-      console.error("FullCalendar is not loaded yet.");
-      return;
-    }
+    if (typeof window.FullCalendar === "undefined") return;
 
     const { Calendar } = window.FullCalendar;
+
     this.calendar = new Calendar(calendarEl, {
       initialView: "dayGridMonth",
       locale: "ja",
@@ -23,7 +22,6 @@ export default class extends Controller {
       expandRows: true,
       dayMaxEvents: true,
 
-      // 余白クリックでモーダルを開く処理（これは残します）
       dateClick: (info) => {
         const newEventUrl = `/events/new?date=${info.dateStr}`;
         const modalFrame = document.getElementById("modal");
@@ -32,17 +30,49 @@ export default class extends Controller {
         }
       },
 
-      // 🚀 修正点：ここに書いてあった `dayCellDidMount` を丸ごと削除しました
+      // 🚀 追加：日付セルが組み立てられる時に祝日を判定してテキストを注入する
+      dayCellDidMount: (info) => {
+        const year = info.date.getFullYear();
+        const month = String(info.date.getMonth() + 1).padStart(2, "0");
+        const day = String(info.date.getDate()).padStart(2, "0");
+        const dateStr = `${year}-${month}-${day}`;
 
-      // 予定クリックで編集モーダルを開く処理（これも残します）
+        // Railsから送られた祝日ハッシュにこの日付があるか判定
+        if (this.holidaysValue && this.holidaysValue[dateStr]) {
+          const holidayName = this.holidaysValue[dateStr];
+
+          // 祝日名を表示する用のスパン要素を作成
+          const holidayLabel = document.createElement("span");
+          holidayLabel.innerText = holidayName;
+          holidayLabel.className = "calendar-holiday-name";
+
+          // 日付の数字が置いてある右上エリアを取得
+          const targetEl = info.el.querySelector(".fc-daygrid-day-top");
+          if (targetEl) {
+            // 数字と祝日テキストを左右に綺麗にセパレートするためのスタイル配置
+            targetEl.style.display = "flex";
+            targetEl.style.flexDirection = "row-reverse";
+            targetEl.style.justifyContent = "space-between";
+            targetEl.style.alignItems = "center";
+            targetEl.style.padding = "2px 8px 0 8px";
+            targetEl.appendChild(holidayLabel);
+          }
+
+          // 🚀 祝日の日の「日付の数字」を赤くするための専用クラスを付与
+          const numberEl = info.el.querySelector(".fc-daygrid-day-number");
+          if (numberEl) {
+            numberEl.classList.add("text-red-active");
+          }
+
+          // 🚀 祝日のマスの背景も日曜日と同じ薄赤にするためのクラスを付与
+          info.el.classList.add("is-holiday");
+        }
+      },
+
       eventClick: (info) => {
         info.jsEvent.preventDefault();
-
-        // 🚀 追加：画面内にFullCalendarのポップアップの閉じるボタン（×）があれば、プログラムからクリックして閉じる
         const popoverCloseBtn = document.querySelector(".fc-popover-close");
-        if (popoverCloseBtn) {
-          popoverCloseBtn.click();
-        }
+        if (popoverCloseBtn) popoverCloseBtn.click();
 
         if (info.event.url) {
           const modalFrame = document.getElementById("modal");
@@ -56,26 +86,15 @@ export default class extends Controller {
     this.calendar.render();
   }
 
-  // WebSocket通知が来たらここが動く
   refresh(event) {
-    // 🚀 サーバーから届いたストリームの「target」属性を取得
     const target = event.detail.newStream.getAttribute("target");
-
-    // カレンダー更新用のコンテナ（calendar-stream-container）宛ての通知の時だけ処理する
     if (target === "calendar-stream-container") {
-      // 空のdivが画面に変に挿入されるのを防止
       event.preventDefault();
-
-      if (this.calendar) {
-        this.calendar.refetchEvents(); // 👈 これでFullCalendarが最新のJSONをシュッと再取得します
-      }
+      if (this.calendar) this.calendar.refetchEvents();
     }
-    // target が "modal" などの場合は、何もせずRails（Turbo）本来の処理（モーダルを閉じる）に流します
   }
 
   disconnect() {
-    if (this.calendar) {
-      this.calendar.destroy();
-    }
+    if (this.calendar) this.calendar.destroy();
   }
 }

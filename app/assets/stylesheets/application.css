@@ -92,3 +92,45 @@
   animation: modalContentBounceIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)
     forwards;
 }
+
+/* 🚀 土曜日の曜日（ヘッダー）と日付の数字を青にする */
+.fc-day-sat .fc-col-header-cell-cushion,
+.fc-day-sat .fc-daygrid-day-number {
+  color: #2563eb !important; /* Tailwindの blue-600 */
+}
+
+/* 🚀 お好みで：土曜日のマスの背景をほんのり薄い青にする場合 */
+.fc-day-sat {
+  background-color: #eff6ff !important; /* Tailwindの blue-50 */
+}
+
+/* 🚀 日曜日の曜日（ヘッダー）と日付の数字を赤にする */
+.fc-day-sun .fc-col-header-cell-cushion,
+.fc-day-sun .fc-daygrid-day-number {
+  color: #ef4444 !important; /* Tailwind の red-500 */
+}
+
+/* 日曜日のマスの背景をほんのり薄赤にする（カレンダー全体にメリハリが出ます） */
+.fc-day-sun {
+  background-color: #fef2f2 !important; /* Tailwind の red-50 */
+}
+
+/* 🚀 JS側でマウントした祝日名テキストのデザイン */
+.calendar-holiday-name {
+  color: #ef4444 !important;
+  font-size: 11px !important;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 祝日の日付の数字も赤く上書きする */
+.text-red-active {
+  color: #ef4444 !important;
+}
+
+/* 祝日のマスの背景も、日曜日と同じ薄赤に同期させる */
+.is-holiday {
+  background-color: #fef2f2 !important;
+}

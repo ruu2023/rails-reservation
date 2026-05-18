@@ -1,12 +1,20 @@
 <%# app/views/events/index.html.erb %>
-<%# 🚀 変更点：p-4 を md:p-4 p-0 に変更してスマホでは壁ベタに %>
-<div data-controller="calendar" data-calendar-url-value="<%= events_path(format: :json) %>" data-turbo-frame="modal" class="h-screen md:p-4 p-0 flex flex-col bg-white">
+<%
+  # 今年と来年の祝日データをあらかじめハッシュ化してJSに安全に渡します
+  start_date = Date.today.beginning_of_year
+  end_date = Date.today.next_year.end_of_year
+  holidays_json = HolidayJp.between(start_date, end_date).map { |h| [h.date.to_s, h.name] }.to_h.to_json
+%>
+<% # 🚀 変更点：data-calendar-holidays-value を追加 %>
+<div data-controller="calendar" 
+     data-calendar-url-value="<%= events_path(format: :json) %>" 
+     data-calendar-holidays-value="<%= holidays_json %>"
+     data-turbo-frame="modal" 
+     class="h-screen md:p-4 p-0 flex flex-col bg-white">
   <div id="calendar-stream-container" data-action="turbo:before-stream-render@document->calendar#refresh">
     <%= turbo_stream_from "events_user_#{current_user.id}" %>
   </div>
-  <%# 🚀 変更点：横スクロールを許可するラッパーを新設 %>
   <div class="flex-1 min-h-0 overflow-x-auto w-full">
-    <%# スマホの時は最低でも650pxの横幅を確保し、PC（md以上）では100%にフィットさせます %>
     <div id="calendar-root" class="h-full min-w-[650px] md:min-w-0"></div>
   </div>
 </div>

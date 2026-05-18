@@ -10,7 +10,6 @@ class EventsController < ApplicationController
       @event.end_time = Time.zone.parse(params[:date]).beginning_of_day.change(hour: 11)
     end
   end
-
   def index
     if params[:start].present? && params[:end].present?
       range_start = Time.zone.parse(params[:start])
@@ -21,6 +20,7 @@ class EventsController < ApplicationController
       range_end = @start_date.end_of_month.end_of_week
     end
 
+    # ユーザー自身の予定だけをシンプルに取得
     @events = current_user.events.where(
       "start_time <= ? AND end_time >= ?", range_end, range_start
     )
@@ -39,7 +39,7 @@ class EventsController < ApplicationController
         }
       }
     end
-  end# app/controllers/events_controller.rb
+  end
 
   def create
     @event = current_user.events.build(event_params)
